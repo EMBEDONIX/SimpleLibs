@@ -13,17 +13,17 @@ auto read_file_bytes(std::string_view filepath) -> std::vector<std::byte> {
   if (!ifs)
     throw std::ios_base::failure("File does not exist");
 
-  auto end = ifs.tellg();
+  const auto end = ifs.tellg();
   ifs.seekg(0, std::ios::beg);
 
-  auto size = std::size_t(end - ifs.tellg());
+  const auto size = static_cast<std::size_t>(end - ifs.tellg());
 
   if (size == 0) // avoid undefined behavior
     return {};
 
   std::vector<std::byte> buffer(size);
 
-  if (!ifs.read((char *) buffer.data(), buffer.size()))
+  if (!ifs.read(reinterpret_cast<char *>(buffer.data()), buffer.size()))
     throw std::ios_base::failure("Read error");
 
   return buffer;

@@ -12,6 +12,9 @@ add_library(embedonix_simplelibs_utilities INTERFACE
         ./include/embedonix/simplelibs/utilities/benchmark.h)
 add_library(embedonix::simplelibs::utilities ALIAS embedonix_simplelibs_utilities)
 
+target_compile_features(embedonix_simplelibs_utilities INTERFACE cxx_std_20)
+target_include_directories(embedonix_simplelibs_utilities INTERFACE include)
+
 install(TARGETS embedonix_simplelibs_utilities
         # CONFIGURATIONS Debug ## Commented out because I want same for both releaes and debug
         DESTINATION /) # will be root of cmake install prefix

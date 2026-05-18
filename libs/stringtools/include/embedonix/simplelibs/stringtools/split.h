@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <iostream>
-#include <ranges>
+#include <string>
 #include <string_view>
+#include <vector>
 
 namespace embedonix::simplelibs::stringtools::split {
 
@@ -16,14 +16,37 @@ namespace embedonix::simplelibs::stringtools::split {
  * @param token Token to split by
  * @return A Container filled with splitted parts of the content
  */
-constexpr auto by_token(auto content, std::string_view token) {
-  using namespace std::ranges;
-  return content
-         | views::split(token)
-         | views::transform([](auto&& str) {
-    return std::string_view(&*str.begin(), distance(str));
-  });
+inline std::vector<std::string_view> by_token(std::string_view content,
+                                              std::string_view token) {
+  auto result = std::vector<std::string_view>();
+
+  if (token.empty()) {
+    result.push_back(content);
+    return result;
+  }
+
+  auto start = std::size_t{0};
+  while (start <= content.size()) {
+    const auto tokenPosition = content.find(token, start);
+    if (tokenPosition == std::string_view::npos) {
+      result.push_back(content.substr(start));
+      break;
+    }
+
+    result.push_back(content.substr(start, tokenPosition - start));
+    start = tokenPosition + token.size();
+  }
+
+  return result;
 }
+
+inline std::vector<std::string_view> by_token(const std::string& content,
+                                              std::string_view token) {
+  return by_token(std::string_view{content}, token);
+}
+
+std::vector<std::string_view> by_token(std::string&& content,
+                                       std::string_view token) = delete;
 
 /**
  * Split a string by the given token
@@ -31,22 +54,30 @@ constexpr auto by_token(auto content, std::string_view token) {
  * @param token Token to split by
  * @return A Container filled with splitted parts of the content
  */
-constexpr auto by_token(auto content, char token) {
-  using namespace std::ranges;
-  return content
-         | views::split(token)
-         | views::transform([](auto&& str) {
-    return std::string_view(&*str.begin(), distance(str));
-  });
+inline std::vector<std::string_view> by_token(std::string_view content,
+                                              char token) {
+  auto result = std::vector<std::string_view>();
+  auto start = std::size_t{0};
+
+  while (start <= content.size()) {
+    const auto tokenPosition = content.find(token, start);
+    if (tokenPosition == std::string_view::npos) {
+      result.push_back(content.substr(start));
+      break;
+    }
+
+    result.push_back(content.substr(start, tokenPosition - start));
+    start = tokenPosition + 1;
+  }
+
+  return result;
 }
 
-/*
-Another possible method:
-     constexpr std::string_view words{"Hello^_^C++^_^20^_^!"};
-    constexpr std::string_view delim{"^_^"};
+inline std::vector<std::string_view> by_token(const std::string& content,
+                                              char token) {
+  return by_token(std::string_view{content}, token);
+}
 
-    for (const auto word : std::views::split(words, delim))
-        std::cout << std::quoted(std::string_view{word.begin(), word.end()}) << ' ';
- */
+std::vector<std::string_view> by_token(std::string&& content, char token) = delete;
 
 } // End namespace namespace embedonix::simplelibs::stringtools

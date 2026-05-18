@@ -12,8 +12,8 @@ add_library(embedonix_simplelibs_math INTERFACE
         ./include/embedonix/simplelibs/math/basic.h)
 add_library(embedonix::simplelibs::math ALIAS embedonix_simplelibs_math)
 
-#target_compile_features(embedonix_simplelibs_math INTERFACE cxx_std_20)
-#target_include_directories(embedonix_simplelibs_math INTERFACE include)
+target_compile_features(embedonix_simplelibs_math INTERFACE cxx_std_20)
+target_include_directories(embedonix_simplelibs_math INTERFACE include)
 
 install(TARGETS embedonix_simplelibs_math
         # CONFIGURATIONS Debug ## Commented out because I want same for both releaes and debug

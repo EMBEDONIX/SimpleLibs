@@ -19,13 +19,6 @@ add_library(embedonix::simplelibs::stringtools ALIAS embedonix_simplelibs_string
 target_compile_features(embedonix_simplelibs_stringtools PUBLIC cxx_std_20)
 target_include_directories(embedonix_simplelibs_stringtools PUBLIC include)
 
-# Have dependency on math lib
-target_link_libraries(embedonix_simplelibs_stringtools
-        PUBLIC embedonix_simplelibs_math)
-target_include_directories(embedonix_simplelibs_stringtools
-        PUBLIC "${CMAKE_SOURCE_DIR}/libs/math/include")
-
-
 install(TARGETS embedonix_simplelibs_stringtools
         # CONFIGURATIONS Debug ## Commented out because I want same for both releaes and debug
         DESTINATION /) # will be root of cmake install prefix

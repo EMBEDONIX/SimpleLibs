@@ -4,7 +4,9 @@
 
 #pragma once
 
-#include <iostream>
+#include <cstddef>
+#include <string>
+#include <string_view>
 #include <vector>
 
 namespace embedonix::simplelibs::fileio::readers {

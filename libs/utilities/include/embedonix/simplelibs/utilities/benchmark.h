@@ -5,6 +5,11 @@
 #pragma once
 
 #include <chrono>
+#include <cstddef>
+#include <format>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
 #include <utility>
 
 namespace embedonix::simplelibs::utilities::benchmark::measure {
@@ -37,9 +42,13 @@ namespace embedonix::simplelibs::utilities::benchmark::measure {
     * @return Average duration it took to execute @b{func} for
     */
     template<typename F, typename... Args>
-    double function_average_execution_time(size_t runTimes, F func, Args &&... args) {
+    double function_average_execution_time(std::size_t runTimes, F func, Args &&... args) {
+        if (runTimes == 0) {
+            throw std::invalid_argument("runTimes must be greater than zero");
+        }
+
         auto sum = 0.0;
-        for (size_t i = 0; i < runTimes; ++i) {
+        for (std::size_t i = 0; i < runTimes; ++i) {
             auto startTime =
                     std::chrono::high_resolution_clock::now();
             // Execute the function

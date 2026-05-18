@@ -15,7 +15,7 @@ The project is still early, but the goal is to keep the APIs small, readable, an
 ## Requirements
 
 - C++20
-- CMake 3.5 or newer
+- CMake 3.15 or newer
 
 ## Build
 

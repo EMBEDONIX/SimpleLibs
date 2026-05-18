@@ -3,17 +3,27 @@
 # Organization: EMBEDONIX.COM
 # Date: 7 May 2023
 
-cmake_minimum_required(VERSION 3.5...3.20)
+cmake_minimum_required(VERSION 3.15...3.29)
 
 project(embedonix_simplelibs_examples VERSION 0.1.0 LANGUAGES CXX)
 
 # Get resource dir that resides above current folder
-cmake_path(GET CMAKE_CURRENT_SOURCE_DIR PARENT_PATH RESOURCES_DIR)
+get_filename_component(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}" DIRECTORY)
 
-file(COPY "${RESOURCES_DIR}/examples/resources/random-files"
-        DESTINATION "${CMAKE_BINARY_DIR}/resources")
-file(COPY "${RESOURCES_DIR}/examples/resources/csv-files"
-        DESTINATION "${CMAKE_BINARY_DIR}/resources")
+set(RANDOM_FILE_RESOURCES
+        "${RESOURCES_DIR}/examples/resources/random-files/one-mb-file"
+        "${RESOURCES_DIR}/examples/resources/random-files/two-mb-file"
+        "${RESOURCES_DIR}/examples/resources/random-files/ten-mb-file")
+
+set(CSV_FILE_RESOURCES
+        "${RESOURCES_DIR}/examples/resources/csv-files/complex-escaped-with-header.csv"
+        "${RESOURCES_DIR}/examples/resources/csv-files/simple-no-header.csv")
+
+# Copy only known example fixtures into the build tree.
+file(COPY ${RANDOM_FILE_RESOURCES}
+        DESTINATION "${CMAKE_BINARY_DIR}/resources/random-files")
+file(COPY ${CSV_FILE_RESOURCES}
+        DESTINATION "${CMAKE_BINARY_DIR}/resources/csv-files")
 
 # Example fileio
 add_executable(fileio
@@ -22,8 +32,8 @@ add_executable(fileio
 target_link_libraries(fileio PRIVATE embedonix_simplelibs_fileio
         PRIVATE embedonix_simplelibs_utilities)
 
-install(DIRECTORY "${RESOURCES_DIR}/examples/resources/random-files"
-        DESTINATION "resources")
+install(FILES ${RANDOM_FILE_RESOURCES}
+        DESTINATION "resources/random-files")
 
 # Example csvparsers
 add_executable(csvparser
@@ -33,8 +43,8 @@ target_link_libraries(csvparser PRIVATE embedonix_simplelibs_parsers
         PRIVATE embedonix_simplelibs_fileio
         PRIVATE embedonix_simplelibs_stringtools)
 
-install(DIRECTORY "${RESOURCES_DIR}/examples/resources/csv-files"
-        DESTINATION "resources")
+install(FILES ${CSV_FILE_RESOURCES}
+        DESTINATION "resources/csv-files")
 
 add_executable(math
         math/math.cpp)

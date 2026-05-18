@@ -23,6 +23,8 @@ project(embedonix_simplelibs
         LANGUAGES CXX
         )
 
+include(CTest)
+
 # Add library subfodlers to compile
 add_subdirectory(./libs/math)
 add_subdirectory(./libs/fileio)
@@ -32,6 +34,10 @@ add_subdirectory(./libs/utilities)
 
 if(BUILD_EXAMPLES)
     add_subdirectory(./examples)
+endif()
+
+if(BUILD_TESTING)
+    add_subdirectory(./tests)
 endif()
 
 

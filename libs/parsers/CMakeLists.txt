@@ -15,14 +15,6 @@ add_library(embedonix::simplelibs::parsers ALIAS embedonix_simplelibs_parsers)
 target_compile_features(embedonix_simplelibs_parsers PUBLIC cxx_std_20)
 target_include_directories(embedonix_simplelibs_parsers PUBLIC include)
 
-target_link_libraries(embedonix_simplelibs_parsers
-        PUBLIC embedonix_simplelibs_math
-        PUBLIC embedonix_simplelibs_stringtools)
-target_include_directories(embedonix_simplelibs_parsers
-        PUBLIC "${CMAKE_SOURCE_DIR}/libs/math/include"
-        PUBLIC "${CMAKE_SOURCE_DIR}/libs/stringtools/include")
-
-
 install(TARGETS embedonix_simplelibs_parsers
         # CONFIGURATIONS Debug ## Commented out because I want same for both releaes and debug
         DESTINATION /) # will be root of cmake install prefix

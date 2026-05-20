@@ -9,41 +9,41 @@
 namespace embedonix::simplelibs::stringtools::trim {
 
 /**
- * Trim a string from left side
- * @param s
+ * @brief Trim whitespace from the left side of a string.
+ * @param s String to modify in place.
  */
 void left(std::string& s);
 
 /**
- * Trim a string from right side
- * @param s
+ * @brief Trim whitespace from the right side of a string.
+ * @param s String to modify in place.
  */
 void right(std::string& s);
 
 /**
- * Trim a string from both side
- * @param s String to be trimmed
+ * @brief Trim whitespace from both sides of a string.
+ * @param s String to modify in place.
  */
 void both_sides(std::string& s);
 
 /**
- * Trim copy of a string from left side
- * @param s The string to be trimmed
- * @return Left trimmed copy of the string
+ * @brief Return a copy with whitespace trimmed from the left side.
+ * @param s String to trim.
+ * @return Left trimmed copy of `s`.
  */
 std::string left_copy(std::string s);
 
 /**
- * Trim copy of a string from right side
- * @param s The string to be trimmed
- * @return Right trimmed copy of the string
+ * @brief Return a copy with whitespace trimmed from the right side.
+ * @param s String to trim.
+ * @return Right trimmed copy of `s`.
  */
 std::string right_copy(std::string s);
 
 /**
- * Trim copy of a string from both side
- * @param s The string to be trimmed
- * @return Trimmed copy of the string
+ * @brief Return a copy with whitespace trimmed from both sides.
+ * @param s String to trim.
+ * @return Trimmed copy of `s`.
  */
 std::string both_sides_copy(std::string s);
 

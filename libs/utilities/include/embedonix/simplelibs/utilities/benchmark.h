@@ -14,12 +14,12 @@
 
 namespace embedonix::simplelibs::utilities::benchmark::measure {
     /**
-     * Measure execution time of a function in microseconds
-     * @tparam F Function Type
-     * @tparam Args Arguments Type
-     * @param func Function name
-     * @param args Arguments to the function
-     * @return
+     * @brief Measure one function call in microseconds.
+     * @tparam F Callable type.
+     * @tparam Args Callable argument types.
+     * @param func Callable to run.
+     * @param args Arguments forwarded to `func`.
+     * @return Elapsed time in microseconds.
      */
     template<typename F, typename... Args>
     double function_execution_time(F func, Args &&... args) {
@@ -32,14 +32,14 @@ namespace embedonix::simplelibs::utilities::benchmark::measure {
     }
 
     /**
-    * Measures average execution time of a function for given number
-    * of executions in microseconds
-    * @tparam F Function Type
-    * @tparam Args Arguments Type
-    * @param runTimes Number of times to execute the function
-    * @param func Function name
-    * @param args Arguments to the function
-    * @return Average duration it took to execute @b{func} for
+    * @brief Measure average execution time of repeated function calls.
+    * @tparam F Callable type.
+    * @tparam Args Callable argument types.
+    * @param runTimes Number of times to run `func`.
+    * @param func Callable to run.
+    * @param args Arguments forwarded to `func`.
+    * @return Average elapsed time in microseconds.
+    * @throws std::invalid_argument If `runTimes` is zero.
     */
     template<typename F, typename... Args>
     double function_average_execution_time(std::size_t runTimes, F func, Args &&... args) {
@@ -60,22 +60,22 @@ namespace embedonix::simplelibs::utilities::benchmark::measure {
     }
 
 
-        /**
-         * Starts a timer for a future use
-         * @tparam Clock Type of the clock to be used
-         * @param timer time_point for the timer
-         */
+    /**
+     * @brief Store the current time in a reusable timer object.
+     * @tparam Clock Clock type to use.
+     * @param timer Time point updated with `Clock::now()`.
+     */
     template<typename Clock = std::chrono::high_resolution_clock>
     inline void start_timer(std::chrono::time_point<Clock>& timer) noexcept {
         timer = Clock::now();
     }
 
     /**
-     * Stops a previously set time_point and returns the duration
-     * @tparam Clock Type of the clock to be used
-     * @tparam Duration Resolution of the duration to return
-     * @param timer The timer object holding the start time
-     * @return The duration from the start time until now
+     * @brief Return elapsed time since a stored timer value.
+     * @tparam Clock Clock type used by `timer`.
+     * @tparam Duration Duration type to return.
+     * @param timer Time point holding the start time.
+     * @return Duration from `timer` until now.
      */
     template<typename Clock = std::chrono::high_resolution_clock,
              typename Duration = std::chrono::microseconds>
@@ -85,11 +85,11 @@ namespace embedonix::simplelibs::utilities::benchmark::measure {
     }
 
     /**
-     * Formats a duration count with unit deduced from Duration type
-     * @tparam Duration Duration type
-     * @param duration Duration object
-     * @param space Adds a space between count and unit
-     * @return
+     * @brief Format a duration with a unit suffix.
+     * @tparam Duration Duration type.
+     * @param duration Duration value to format.
+     * @param space When `true`, insert a space between count and unit.
+     * @return Formatted duration string.
      */
     template <typename Duration>
     inline

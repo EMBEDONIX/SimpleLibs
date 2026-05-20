@@ -86,6 +86,7 @@ csv_parse_result parse_csv(std::string_view source,
         }
 
         if (wrapperClosed) {
+            // Once a quoted field is closed, only padding, delimiter, or row end is valid.
             if (std::isspace(static_cast<unsigned char>(current)) != 0) {
                 continue;
             }
@@ -124,6 +125,8 @@ csv_parse_result try_csv_file_with_wrapper(
         return rows;
     }
 
+    // Header skipping happens only after a successful parse, so row indexes stay
+    // meaningful when an error is reported.
     if (skipHeader && !rows.rows.empty()) {
         rows.rows.erase(rows.rows.begin());
     }

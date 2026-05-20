@@ -11,6 +11,7 @@ void left(std::string& s) {
 }
 
 void right(std::string& s) {
+  // base() converts the reverse iterator to the first trailing whitespace.
   s.erase(std::ranges::find_if(s.rbegin(), s.rend(),
                        [](unsigned char ch) {
                          return !std::isspace(ch);

@@ -11,16 +11,19 @@
 namespace embedonix::simplelibs::stringtools::split {
 
 /**
- * Split a string by the given token
- * @param content A Sequence of characters
- * @param token Token to split by
- * @return A Container filled with splitted parts of the content
+ * @brief Split a character sequence by a string token.
+ * @param content Text to split.
+ * @param token Token to split on. An empty token returns `content` unchanged.
+ * @return Views into `content`, including empty views for trailing separators.
+ *
+ * @warning Returned `std::string_view` values borrow from `content`.
  */
 inline std::vector<std::string_view> by_token(std::string_view content,
                                               std::string_view token) {
   auto result = std::vector<std::string_view>();
 
   if (token.empty()) {
+    // There is no safe split point for an empty token, so return the full view.
     result.push_back(content);
     return result;
   }
@@ -40,19 +43,29 @@ inline std::vector<std::string_view> by_token(std::string_view content,
   return result;
 }
 
+/**
+ * @overload
+ */
 inline std::vector<std::string_view> by_token(const std::string& content,
                                               std::string_view token) {
   return by_token(std::string_view{content}, token);
 }
 
+/**
+ * @brief Deleted overload for temporary strings.
+ *
+ * Returned views would dangle if a temporary string were accepted.
+ */
 std::vector<std::string_view> by_token(std::string&& content,
                                        std::string_view token) = delete;
 
 /**
- * Split a string by the given token
- * @param content A Sequence of characters
- * @param token Token to split by
- * @return A Container filled with splitted parts of the content
+ * @brief Split a character sequence by a character token.
+ * @param content Text to split.
+ * @param token Character to split on.
+ * @return Views into `content`, including empty views for trailing separators.
+ *
+ * @warning Returned `std::string_view` values borrow from `content`.
  */
 inline std::vector<std::string_view> by_token(std::string_view content,
                                               char token) {
@@ -73,11 +86,19 @@ inline std::vector<std::string_view> by_token(std::string_view content,
   return result;
 }
 
+/**
+ * @overload
+ */
 inline std::vector<std::string_view> by_token(const std::string& content,
                                               char token) {
   return by_token(std::string_view{content}, token);
 }
 
+/**
+ * @brief Deleted overload for temporary strings.
+ *
+ * Returned views would dangle if a temporary string were accepted.
+ */
 std::vector<std::string_view> by_token(std::string&& content, char token) = delete;
 
 } // End namespace namespace embedonix::simplelibs::stringtools

@@ -10,6 +10,7 @@
 namespace embedonix::simplelibs::fileio::readers {
 
 auto read_file_bytes(const std::filesystem::path& filepath) -> std::vector<std::byte> {
+  // Open at the end first so tellg can give the exact file size before reading.
   std::ifstream ifs(filepath, std::ios::binary | std::ios::ate);
 
   if (!ifs)
@@ -48,6 +49,7 @@ auto read_file_bytes(const char* filepath) -> std::vector<std::byte> {
 
 auto read_file_bytes_into(const std::filesystem::path& filepath,
                           std::vector<std::byte>& buffer) -> std::size_t {
+    // Keep the caller owned buffer size unchanged. It must already be large enough.
     std::ifstream ifs(filepath, std::ios::binary | std::ios::ate);
 
     if (!ifs)
@@ -93,6 +95,7 @@ auto read_file_bytes_caller_alloc(std::string_view filepath,
     try {
         read_file_bytes_into(filepath, buffer);
     } catch (const std::length_error&) {
+        // Preserve the old bool contract while letting I/O errors still throw.
         return false;
     }
 
@@ -114,6 +117,7 @@ auto read_file_bytes_caller_alloc(const std::filesystem::path& filepath,
     try {
         read_file_bytes_into(filepath, buffer);
     } catch (const std::length_error&) {
+        // Preserve the old bool contract while letting I/O errors still throw.
         return false;
     }
 

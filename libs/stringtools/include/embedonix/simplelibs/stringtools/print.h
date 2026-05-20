@@ -10,16 +10,14 @@
 namespace embedonix::simplelibs::stringtools::print {
 
 /**
- * Prints all elements of a container to an stream (stdout by default)
- * @tparam CONTAINER A Container compatible with std containers
- * @tparam DELIMITER Type of printable to be put between each element when
- * printing
- * @param container Container to print
- * @param delimiter A Character or string to separate each element
- * @param addNewLine Add a new line when done printing
- * @param os The stream to print into
+ * @brief Print all elements of a container to a stream.
+ * @tparam CONTAINER Container type with `std::begin` and `std::end` support.
+ * @tparam DELIMITER Printable delimiter type.
+ * @param container Container to print.
+ * @param delimiter Value printed between elements.
+ * @param addNewLine When `true`, write a newline after the final element.
+ * @param os Stream to print into.
  */
-
 template<class CONTAINER, typename DELIMITER = char>
 void container(const CONTAINER& container, DELIMITER delimiter = ' ',
                      bool addNewLine = true,

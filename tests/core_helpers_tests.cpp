@@ -49,6 +49,7 @@ int main() {
     const auto stringParts = split::by_token(splitSource, "--");
     expect_equal(stringParts, std::vector<std::string_view>{"aa", "bb", ""}, "string split");
 
+    // Use a unique path so parallel test runs from different build trees do not collide.
     const auto tempName = "embedonix_simplelibs_tests_" +
         std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
     auto tempDir = std::filesystem::temp_directory_path() / tempName;

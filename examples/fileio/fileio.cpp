@@ -24,11 +24,9 @@ void read_file_bytes(std::string path) {
 }
 
 void read_file_bytes_caller_alloc(std::string path, std::vector<std::byte> &buffer) {
-    volatile auto result = embedonix::simplelibs::fileio::readers::read_file_bytes_caller_alloc(
+    volatile auto result = embedonix::simplelibs::fileio::readers::read_file_bytes_into(
             path, buffer);
-    if (!result) {
-        exit(1);
-    }
+    (void)result;
 }
 
 void read_file(std::string path) {
@@ -51,7 +49,7 @@ constinit auto files = std::array<std::string_view, 3>{
 // Number of runs for each read file function
 constinit size_t testsPerFile = 20;
 
-int main(int argc, char **argv) {
+int main() {
 
     // Allocate a big enough buffer for files up to 10MB
     auto buffer = std::vector<std::byte>(11'000'000);

@@ -50,5 +50,22 @@ int main() {
                  {{"alpha", "line 1\r\nline 2"}},
                  "quoted newline");
 
+    const auto malformed = embedonix::simplelibs::parsers::try_csv_file_with_wrapper(
+        "name,notes\n\"alpha\",\"unterminated", ',', '"');
+    if (!malformed.has_error() ||
+        malformed.error != embedonix::simplelibs::parsers::csv_parse_error::unclosed_wrapped_field) {
+        throw std::runtime_error("malformed csv result");
+    }
+
+    auto threw = false;
+    try {
+        (void)csv_file_with_wrapper("name,notes\n\"alpha\",\"unterminated", ',', '"');
+    } catch (const std::invalid_argument&) {
+        threw = true;
+    }
+    if (!threw) {
+        throw std::runtime_error("malformed csv throw");
+    }
+
     return 0;
 }

@@ -3,6 +3,7 @@
 #include <embedonix/simplelibs/stringtools/split.h>
 #include <embedonix/simplelibs/utilities/benchmark.h>
 
+#include <chrono>
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
@@ -48,7 +49,9 @@ int main() {
     const auto stringParts = split::by_token(splitSource, "--");
     expect_equal(stringParts, std::vector<std::string_view>{"aa", "bb", ""}, "string split");
 
-    auto tempDir = std::filesystem::temp_directory_path() / "embedonix_simplelibs_tests";
+    const auto tempName = "embedonix_simplelibs_tests_" +
+        std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    auto tempDir = std::filesystem::temp_directory_path() / tempName;
     std::filesystem::create_directories(tempDir);
 
     const auto textPath = tempDir / "text.txt";
@@ -64,10 +67,17 @@ int main() {
     auto smallBuffer = std::vector<std::byte>(2);
     expect_true(!fileio::read_file_bytes_caller_alloc(textPath.string(), smallBuffer),
                 "small caller buffer");
+    auto tooSmallThrew = false;
+    try {
+        fileio::read_file_bytes_into(textPath, smallBuffer);
+    } catch (const std::length_error&) {
+        tooSmallThrew = true;
+    }
+    expect_true(tooSmallThrew, "small buffer throws");
 
     auto buffer = std::vector<std::byte>(5);
-    expect_true(fileio::read_file_bytes_caller_alloc(textPath.string(), buffer),
-                "caller buffer");
+    expect_equal(fileio::read_file_bytes_into(textPath, buffer), std::size_t{5},
+                 "bytes read count");
     expect_true(buffer[0] == std::byte{'h'} && buffer[4] == std::byte{'o'},
                 "caller buffer content");
 

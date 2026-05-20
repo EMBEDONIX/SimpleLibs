@@ -17,7 +17,7 @@ constinit auto files = std::array<std::string_view, 1>{
         "../resources/csv-files/complex-escaped-with-header.csv"
 };
 
-int main(int argc, char **args) {
+int main() {
     std::cout << "Welcome to CSVPARSER example!" << std::endl;
     auto content = fileio::readers::read_file(files[0].data());
     //auto data = parsers::csv_file(content);

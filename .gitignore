@@ -45,6 +45,9 @@
 # CMake
 cmake-build-*/
 
+# Generated benchmark fixtures
+examples/resources/random-files/*
+
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
 

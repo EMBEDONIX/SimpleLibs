@@ -4,11 +4,28 @@
 
 #pragma once
 
+#include <cstddef>
 #include <string>
 #include <string_view>
 #include <vector>
 
 namespace embedonix::simplelibs::parsers {
+enum class csv_parse_error {
+    none,
+    unclosed_wrapped_field,
+    unexpected_character_after_wrapper
+};
+
+struct csv_parse_result {
+    std::vector<std::vector<std::string>> rows;
+    csv_parse_error error = csv_parse_error::none;
+    std::size_t error_position = 0;
+
+    [[nodiscard]] bool has_error() const noexcept {
+        return error != csv_parse_error::none;
+    }
+};
+
 /**
  * Parse a Character Separated Value (default delimiter is comma ',').
  * @note If elements are wrapped with a pair of characters, please use \
@@ -36,6 +53,12 @@ std::vector<std::vector<std::string>> csv_file(std::string_view source,
  * @return Parsed values as vector of string vector
  */
 std::vector<std::vector<std::string>> csv_file_with_wrapper(
+    std::string_view source,
+    char delimiter = ',',
+    char wrapper = '"',
+    bool skipHeader = true);
+
+csv_parse_result try_csv_file_with_wrapper(
     std::string_view source,
     char delimiter = ',',
     char wrapper = '"',

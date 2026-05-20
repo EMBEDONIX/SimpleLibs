@@ -5,12 +5,12 @@
 #include "embedonix/simplelibs/fileio/filereader.h"
 
 #include <fstream>
+#include <stdexcept>
 
 namespace embedonix::simplelibs::fileio::readers {
 
-auto read_file_bytes(std::string_view filepath) -> std::vector<std::byte> {
-  const auto path = std::string(filepath);
-  std::ifstream ifs(path, std::ios::binary | std::ios::ate);
+auto read_file_bytes(const std::filesystem::path& filepath) -> std::vector<std::byte> {
+  std::ifstream ifs(filepath, std::ios::binary | std::ios::ate);
 
   if (!ifs)
     throw std::ios_base::failure("File does not exist");
@@ -34,10 +34,21 @@ auto read_file_bytes(std::string_view filepath) -> std::vector<std::byte> {
   return buffer;
 }
 
-auto read_file_bytes_caller_alloc(std::string_view filepath,
-                                            std::vector<std::byte>& buffer)-> bool {
-    const auto path = std::string(filepath);
-    std::ifstream ifs(path, std::ios::binary | std::ios::ate);
+auto read_file_bytes(std::string_view filepath) -> std::vector<std::byte> {
+  return read_file_bytes(std::filesystem::path{std::string(filepath)});
+}
+
+auto read_file_bytes(const std::string& filepath) -> std::vector<std::byte> {
+  return read_file_bytes(std::filesystem::path{filepath});
+}
+
+auto read_file_bytes(const char* filepath) -> std::vector<std::byte> {
+  return read_file_bytes(std::filesystem::path{filepath});
+}
+
+auto read_file_bytes_into(const std::filesystem::path& filepath,
+                          std::vector<std::byte>& buffer) -> std::size_t {
+    std::ifstream ifs(filepath, std::ios::binary | std::ios::ate);
 
     if (!ifs)
         throw std::ios_base::failure("File does not exist");
@@ -51,20 +62,67 @@ auto read_file_bytes_caller_alloc(std::string_view filepath,
     const auto size = static_cast<std::size_t>(end - ifs.tellg());
 
     if (size == 0)
-        return true;
+        return 0;
 
     if (buffer.size() < size)
-        return false;
+        throw std::length_error("Buffer is smaller than file");
 
     if (!ifs.read(reinterpret_cast<char *>(buffer.data()), size))
         throw std::ios_base::failure("Read error");
 
+    return size;
+}
+
+auto read_file_bytes_into(std::string_view filepath,
+                          std::vector<std::byte>& buffer) -> std::size_t {
+    return read_file_bytes_into(std::filesystem::path{std::string(filepath)}, buffer);
+}
+
+auto read_file_bytes_into(const std::string& filepath,
+                          std::vector<std::byte>& buffer) -> std::size_t {
+    return read_file_bytes_into(std::filesystem::path{filepath}, buffer);
+}
+
+auto read_file_bytes_into(const char* filepath,
+                          std::vector<std::byte>& buffer) -> std::size_t {
+    return read_file_bytes_into(std::filesystem::path{filepath}, buffer);
+}
+
+auto read_file_bytes_caller_alloc(std::string_view filepath,
+                                            std::vector<std::byte>& buffer)-> bool {
+    try {
+        read_file_bytes_into(filepath, buffer);
+    } catch (const std::length_error&) {
+        return false;
+    }
+
     return true;
 }
 
-auto read_file(std::string_view path) -> std::string {
+auto read_file_bytes_caller_alloc(const std::string& filepath,
+                                  std::vector<std::byte>& buffer) -> bool {
+    return read_file_bytes_caller_alloc(std::string_view{filepath}, buffer);
+}
+
+auto read_file_bytes_caller_alloc(const char* filepath,
+                                  std::vector<std::byte>& buffer) -> bool {
+    return read_file_bytes_caller_alloc(std::string_view{filepath}, buffer);
+}
+
+auto read_file_bytes_caller_alloc(const std::filesystem::path& filepath,
+                                  std::vector<std::byte>& buffer) -> bool {
+    try {
+        read_file_bytes_into(filepath, buffer);
+    } catch (const std::length_error&) {
+        return false;
+    }
+
+    return true;
+}
+
+auto read_file(const std::filesystem::path& path) -> std::string {
   constexpr auto read_size = std::size_t(4096);
-  auto stream = std::ifstream(std::string(path));
+  auto stream = std::ifstream(path);
   stream.exceptions(std::ios_base::badbit);
 
   if (not stream) {
@@ -80,12 +138,36 @@ auto read_file(std::string_view path) -> std::string {
   return out;
 }
 
-auto read_file_string(std::string_view filepath) -> std::string {
+auto read_file(std::string_view path) -> std::string {
+  return read_file(std::filesystem::path{std::string(path)});
+}
+
+auto read_file(const std::string& path) -> std::string {
+  return read_file(std::filesystem::path{path});
+}
+
+auto read_file(const char* path) -> std::string {
+  return read_file(std::filesystem::path{path});
+}
+
+auto read_file_string(const std::filesystem::path& filepath) -> std::string {
   auto bytes = read_file_bytes(filepath);
   if (bytes.empty())
     return {};
 
   return std::string(reinterpret_cast<const char *>(bytes.data()), bytes.size());
+}
+
+auto read_file_string(std::string_view filepath) -> std::string {
+  return read_file_string(std::filesystem::path{std::string(filepath)});
+}
+
+auto read_file_string(const std::string& filepath) -> std::string {
+  return read_file_string(std::filesystem::path{filepath});
+}
+
+auto read_file_string(const char* filepath) -> std::string {
+  return read_file_string(std::filesystem::path{filepath});
 }
 
 

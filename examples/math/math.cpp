@@ -6,7 +6,7 @@
 #include <embedonix/simplelibs/stringtools/print.h>
 #include <embedonix/simplelibs/math/basic.h>
 
-int main(int argc, char **args) {
+int main() {
 
     std::cout << "Welcome to MATH example!" << std::endl;
 

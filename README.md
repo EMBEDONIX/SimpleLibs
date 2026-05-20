@@ -37,6 +37,27 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
+## Install And Use With CMake
+
+```sh
+cmake -S . -B build -DBUILD_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=/path/to/install
+cmake --build build
+cmake --install build
+```
+
+Then consume it from another CMake project:
+
+```cmake
+find_package(embedonix_simplelibs CONFIG REQUIRED)
+
+target_link_libraries(app PRIVATE
+    embedonix::simplelibs::math
+    embedonix::simplelibs::fileio
+    embedonix::simplelibs::parsers
+    embedonix::simplelibs::stringtools
+    embedonix::simplelibs::utilities)
+```
+
 ## Quick Example
 
 ```cpp

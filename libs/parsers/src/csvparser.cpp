@@ -5,14 +5,15 @@
 #include "embedonix/simplelibs/parsers/csvparser.h"
 
 #include <cctype>
+#include <stdexcept>
 
 namespace embedonix::simplelibs::parsers {
 
 namespace {
-std::vector<std::vector<std::string>> parse_csv(std::string_view source,
-                                                char delimiter,
-                                                char wrapper,
-                                                bool useWrapper) {
+csv_parse_result parse_csv(std::string_view source,
+                           char delimiter,
+                           char wrapper,
+                           bool useWrapper) {
     auto rows = std::vector<std::vector<std::string>>();
     auto row = std::vector<std::string>();
     auto field = std::string();
@@ -84,10 +85,12 @@ std::vector<std::vector<std::string>> parse_csv(std::string_view source,
             continue;
         }
 
-        // Ignore padding after a closing wrapper until the delimiter or newline.
-        if (wrapperClosed &&
-            std::isspace(static_cast<unsigned char>(current)) != 0) {
-            continue;
+        if (wrapperClosed) {
+            if (std::isspace(static_cast<unsigned char>(current)) != 0) {
+                continue;
+            }
+
+            return {rows, csv_parse_error::unexpected_character_after_wrapper, i};
         }
 
         field.push_back(current);
@@ -95,28 +98,46 @@ std::vector<std::vector<std::string>> parse_csv(std::string_view source,
         wrapperClosed = false;
     }
 
+    if (inWrappedField) {
+        return {rows, csv_parse_error::unclosed_wrapped_field, source.size()};
+    }
+
     // Add the final row when the input does not end with a newline.
     if (fieldStarted || !field.empty() || !row.empty()) {
         finishRow();
     }
 
-    return rows;
+    return {rows, csv_parse_error::none, 0};
 }
 } // End anonymous namespace
 
 std::vector<std::vector<std::string>> csv_file(std::string_view source,
                                                char delimiter) {
-    return parse_csv(source, delimiter, '\0', false);
+    return parse_csv(source, delimiter, '\0', false).rows;
+}
+
+csv_parse_result try_csv_file_with_wrapper(
+    std::string_view source, char delimiter, char wrapper, bool skipHeader) {
+    auto rows = parse_csv(source, delimiter, wrapper, true);
+
+    if (rows.has_error()) {
+        return rows;
+    }
+
+    if (skipHeader && !rows.rows.empty()) {
+        rows.rows.erase(rows.rows.begin());
+    }
+
+    return rows;
 }
 
 std::vector<std::vector<std::string>> csv_file_with_wrapper(
     std::string_view source, char delimiter, char wrapper, bool skipHeader) {
-    auto rows = parse_csv(source, delimiter, wrapper, true);
-
-    if (skipHeader && !rows.empty()) {
-        rows.erase(rows.begin());
+    auto result = try_csv_file_with_wrapper(source, delimiter, wrapper, skipHeader);
+    if (result.has_error()) {
+        throw std::invalid_argument("Malformed CSV input");
     }
 
-    return rows;
+    return result.rows;
 }
 } // End Namespace embedonix::simplelibs::parsers

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cctype>
 #include <embedonix/simplelibs/stringtools/trim.h>
 

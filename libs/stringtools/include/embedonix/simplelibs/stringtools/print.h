@@ -5,7 +5,7 @@
 #pragma once
 
 #include <iostream>
-#include <ranges>
+#include <iterator>
 
 namespace embedonix::simplelibs::stringtools::print {
 

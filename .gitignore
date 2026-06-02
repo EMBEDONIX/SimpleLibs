@@ -43,6 +43,8 @@
 # *.ipr
 
 # CMake
+build/
+build-*/
 cmake-build-*/
 
 # Generated benchmark fixtures

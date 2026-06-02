@@ -1,12 +1,15 @@
 #include <embedonix/simplelibs/fileio/filereader.h>
 #include <embedonix/simplelibs/math/basic.h>
+#include <embedonix/simplelibs/stringtools/print.h>
 #include <embedonix/simplelibs/stringtools/split.h>
+#include <embedonix/simplelibs/stringtools/trim.h>
 #include <embedonix/simplelibs/utilities/benchmark.h>
 
 #include <chrono>
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -35,7 +38,9 @@ void write_file(const std::filesystem::path& path, std::string_view content) {
 int main() {
     namespace fileio = embedonix::simplelibs::fileio::readers;
     namespace math = embedonix::simplelibs::math::basic_operations;
+    namespace print = embedonix::simplelibs::stringtools::print;
     namespace split = embedonix::simplelibs::stringtools::split;
+    namespace trim = embedonix::simplelibs::stringtools::trim;
     namespace benchmark = embedonix::simplelibs::utilities::benchmark::measure;
 
     static_assert(math::is_even(2));
@@ -48,6 +53,17 @@ int main() {
     const auto splitSource = std::string{"aa--bb--"};
     const auto stringParts = split::by_token(splitSource, "--");
     expect_equal(stringParts, std::vector<std::string_view>{"aa", "bb", ""}, "string split");
+
+    auto padded = std::string{" \tvalue\r\n"};
+    trim::both_sides(padded);
+    expect_equal(padded, std::string{"value"}, "trim both sides");
+    expect_equal(trim::left_copy("  left"), std::string{"left"}, "left trim copy");
+    expect_equal(trim::right_copy("right  "), std::string{"right"}, "right trim copy");
+    expect_equal(trim::both_sides_copy(" \t\n"), std::string{}, "trim whitespace only");
+
+    auto stream = std::ostringstream();
+    print::container(std::vector<int>{1, 2, 3}, ',', false, stream);
+    expect_equal(stream.str(), std::string{"1,2,3"}, "container print");
 
     // Use a unique path so parallel test runs from different build trees do not collide.
     const auto tempName = "embedonix_simplelibs_tests_" +
@@ -86,6 +102,10 @@ int main() {
     benchmark::start_timer(timer);
     const auto elapsed = benchmark::stop_timer<std::chrono::steady_clock>(timer);
     (void)elapsed;
+    expect_equal(benchmark::format_duration(std::chrono::milliseconds{7}), std::string{"7ms"},
+                 "format duration compact");
+    expect_equal(benchmark::format_duration(std::chrono::microseconds{11}, true),
+                 std::string{"11 us"}, "format duration spaced");
 
     auto threw = false;
     try {

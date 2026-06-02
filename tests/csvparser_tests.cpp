@@ -18,6 +18,10 @@ int main() {
     using embedonix::simplelibs::parsers::csv_file;
     using embedonix::simplelibs::parsers::csv_file_with_wrapper;
 
+    expect_equal(csv_file(""),
+                 {},
+                 "empty csv");
+
     expect_equal(csv_file("a,b,c\n1,2,3"),
                  {{"a", "b", "c"}, {"1", "2", "3"}},
                  "simple csv");
@@ -25,6 +29,10 @@ int main() {
     expect_equal(csv_file("a,b,\n,,"),
                  {{"a", "b", ""}, {"", "", ""}},
                  "empty fields");
+
+    expect_equal(csv_file("a,b\n"),
+                 {{"a", "b"}},
+                 "trailing newline");
 
     expect_equal(csv_file_with_wrapper("name,notes\n\"alpha\",\"one,two\"", ',', '"'),
                  {{"alpha", "one,two"}},
@@ -50,11 +58,23 @@ int main() {
                  {{"alpha", "line 1\r\nline 2"}},
                  "quoted newline");
 
+    expect_equal(csv_file_with_wrapper("name,notes\n\"alpha\"  ,\"beta\"", ',', '"'),
+                 {{"alpha", "beta"}},
+                 "padding after wrapper");
+
     const auto malformed = embedonix::simplelibs::parsers::try_csv_file_with_wrapper(
         "name,notes\n\"alpha\",\"unterminated", ',', '"');
     if (!malformed.has_error() ||
         malformed.error != embedonix::simplelibs::parsers::csv_parse_error::unclosed_wrapped_field) {
         throw std::runtime_error("malformed csv result");
+    }
+
+    const auto unexpected = embedonix::simplelibs::parsers::try_csv_file_with_wrapper(
+        "name,notes\n\"alpha\"x,\"beta\"", ',', '"');
+    if (!unexpected.has_error() ||
+        unexpected.error != embedonix::simplelibs::parsers::csv_parse_error::unexpected_character_after_wrapper ||
+        unexpected.error_position != 18) {
+        throw std::runtime_error("unexpected character after wrapper");
     }
 
     auto threw = false;

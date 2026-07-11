@@ -5,7 +5,17 @@
 #include "embedonix/simplelibs/fileio/filereader.h"
 
 #include <fstream>
+#include <limits>
 #include <stdexcept>
+
+namespace {
+auto checked_stream_size(std::size_t size) -> std::streamsize {
+  if (size > static_cast<std::size_t>(std::numeric_limits<std::streamsize>::max()))
+    throw std::length_error("File is too large to read");
+
+  return static_cast<std::streamsize>(size);
+}
+} // namespace
 
 namespace embedonix::simplelibs::fileio::readers {
 
@@ -29,7 +39,7 @@ auto read_file_bytes(const std::filesystem::path& filepath) -> std::vector<std::
 
   std::vector<std::byte> buffer(size);
 
-  if (!ifs.read(reinterpret_cast<char *>(buffer.data()), buffer.size()))
+  if (!ifs.read(reinterpret_cast<char *>(buffer.data()), checked_stream_size(buffer.size())))
     throw std::ios_base::failure("Read error");
 
   return buffer;
@@ -69,7 +79,7 @@ auto read_file_bytes_into(const std::filesystem::path& filepath,
     if (buffer.size() < size)
         throw std::length_error("Buffer is smaller than file");
 
-    if (!ifs.read(reinterpret_cast<char *>(buffer.data()), size))
+    if (!ifs.read(reinterpret_cast<char *>(buffer.data()), checked_stream_size(size)))
         throw std::ios_base::failure("Read error");
 
     return size;

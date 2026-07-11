@@ -27,8 +27,8 @@ namespace embedonix::simplelibs::utilities::benchmark::measure {
                 std::chrono::high_resolution_clock::now();
         // Execute the function
         func(std::forward<Args>(args)...);
-        return std::chrono::duration_cast<std::chrono::microseconds>
-                (std::chrono::high_resolution_clock::now() - startTime).count();
+        return static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>
+                (std::chrono::high_resolution_clock::now() - startTime).count());
     }
 
     /**
@@ -37,12 +37,12 @@ namespace embedonix::simplelibs::utilities::benchmark::measure {
     * @tparam Args Callable argument types.
     * @param runTimes Number of times to run `func`.
     * @param func Callable to run.
-    * @param args Arguments forwarded to `func`.
+    * @param args Arguments passed to `func` on each run.
     * @return Average elapsed time in microseconds.
     * @throws std::invalid_argument If `runTimes` is zero.
     */
     template<typename F, typename... Args>
-    double function_average_execution_time(std::size_t runTimes, F func, Args &&... args) {
+    double function_average_execution_time(std::size_t runTimes, F func, Args... args) {
         if (runTimes == 0) {
             throw std::invalid_argument("runTimes must be greater than zero");
         }
@@ -52,11 +52,11 @@ namespace embedonix::simplelibs::utilities::benchmark::measure {
             auto startTime =
                     std::chrono::high_resolution_clock::now();
             // Execute the function
-            func(std::forward<Args>(args)...);
-            sum += std::chrono::duration_cast<std::chrono::microseconds>
-                    (std::chrono::high_resolution_clock::now() - startTime).count();
+            func(args...);
+            sum += static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>
+                    (std::chrono::high_resolution_clock::now() - startTime).count());
         }
-        return (sum / runTimes);
+        return (sum / static_cast<double>(runTimes));
     }
 
 
@@ -93,8 +93,7 @@ namespace embedonix::simplelibs::utilities::benchmark::measure {
      */
     template <typename Duration>
     inline
-    std::string format_duration(Duration duration, bool space = false)
-    noexcept {
+    std::string format_duration(Duration duration, bool space = false) {
         using namespace std::chrono;
 
         // Extract count value from the duration
